@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback, useState } from "react";
-import { convertToPars, convertToString, defaultValueBody, defaultValueHeader, tableOptions } from "./utils/utils";
+import { convertToPars, convertToString, defaultValueBody, defaultValueHeader, tableOptions } from "../utils/utils";
 
 type AnyObject = {
   [key: string]: any;
@@ -19,7 +19,7 @@ const labelColorOptions = {
   number: "bg-amber-200 text-amber-700",
 };
 
-export const calculation = (first: any, second: any, operator: OperatorType): React.JSX.Element => {
+const calculation = (first: any, second: any, operator: OperatorType): React.JSX.Element => {
   let result;
   if (operator === "+") result = first + second;
   else if (operator === "-") result = first - second;
