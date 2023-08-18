@@ -78,8 +78,8 @@ export const convertToString = (value: any): string => {
 
 export const convertToPars = (value: any): null | undefined | object | [] | string | number | boolean => {
   if (/(['"]).*\1/g.test(value)) {
-    const replaceValue = value.replace(/(['"])["']{2}\1/g, "");
-    return JSON.parse(replaceValue);
+    let newValue = value.replace(/(['"])["']{2}\1/g, "");
+    return JSON.parse(newValue);
   } else if (value.includes("[") && value.includes("]")) {
     const firstIndex = value.indexOf("[") + 1;
     let lastIndex = value.indexOf(",");
@@ -96,40 +96,26 @@ export const convertToPars = (value: any): null | undefined | object | [] | stri
     return NaN;
   } else if (value === "Infinity") {
     return Infinity;
-  } else if (value && (value === "false" || value === "true" || !isNaN(value))) {
+  } else if (value === "false" || value === "true") {
     return JSON.parse(value);
+  } else if (value && !isNaN(value)) {
+    return Number(value);
   } else {
     return value;
   }
 };
 
-const defaultValue = [
-  0,
-  "0",
-  [0],
-  [],
-  {},
-  "",
-  null,
-  [null],
-  undefined,
-  NaN,
-  [NaN],
-  "a",
-  Infinity,
-  1,
-  "1",
-  [1],
-  true,
-  false,
-  "true",
-  "false",
-];
+const defaultValue = () => {
+  return [0, "0", [0], [], {}, "", null, [null], undefined, NaN, [NaN], "a", Infinity, 1, "1", [1], true, false, "true", "false"];
+};
+
+const HeaderDefaultValue = defaultValue();
+const bodyDefaultValue = defaultValue();
 
 export const defaultValueHeader = tableOptions.header.reduce(
   (prev, current, index) => {
-    prev.string = { ...prev.string, [current]: convertToString(defaultValue[index]) };
-    prev.params = { ...prev.params, [current]: defaultValue[index] };
+    prev.string = { ...prev.string, [current]: convertToString(HeaderDefaultValue[index]) };
+    prev.params = { ...prev.params, [current]: HeaderDefaultValue[index] };
 
     return prev;
   },
@@ -138,8 +124,8 @@ export const defaultValueHeader = tableOptions.header.reduce(
 
 export const defaultValueBody = tableOptions.body.reduce(
   (prev, current, index) => {
-    prev.string = { ...prev.string, [current]: convertToString(defaultValue[index]) };
-    prev.params = { ...prev.params, [current]: defaultValue[index] };
+    prev.string = { ...prev.string, [current]: convertToString(bodyDefaultValue[index]) };
+    prev.params = { ...prev.params, [current]: bodyDefaultValue[index] };
 
     return prev;
   },
