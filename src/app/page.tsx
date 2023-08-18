@@ -1,141 +1,30 @@
 "use client";
+import React, { useCallback, useState } from "react";
+import { convertToPars, convertToString, defaultValueBody, defaultValueHeader, tableOptions } from "./utils/utils";
 
-import React, { useEffect, useState } from "react";
+type AnyObject = {
+  [key: string]: any;
+};
 
 type OperatorType = "+" | "-" | "*" | "**" | "/" | "==" | "===";
-
-const bodyOptions = [
-  "body1",
-  "body2",
-  "body3",
-  "body4",
-  "body5",
-  "body6",
-  "body7",
-  "body8",
-  "body9",
-  "body10",
-  "body11",
-  "body12",
-  "body13",
-  "body14",
-  "body15",
-  "body16",
-  "body17",
-  "body18",
-  "body19",
-  "body20",
-];
-
-const headerOptions = [
-  "header1",
-  "header2",
-  "header3",
-  "header4",
-  "header5",
-  "header6",
-  "header7",
-  "header8",
-  "header9",
-  "header10",
-  "header11",
-  "header12",
-  "header13",
-  "header14",
-  "header15",
-  "header16",
-  "header17",
-  "header18",
-  "header19",
-  "header20",
-];
+type DataType = { body: AnyObject; header: AnyObject; operator: OperatorType };
+type ValueType = { body: AnyObject; header: AnyObject };
 
 const operator: OperatorType[] = ["+", "-", "*", "**", "/", "==", "==="];
 
-const defaultValue = [
-  0,
-  "0",
-  [0],
-  [],
-  {},
-  "",
-  null,
-  [null],
-  undefined,
-  NaN,
-  [NaN],
-  "a",
-  Infinity,
-  1,
-  "1",
-  [1],
-  true,
-  false,
-  "true",
-  "false",
-];
-
-const convertToString = (value: any): string => {
-  if (typeof value === "string") {
-    return `"${value}"`;
-  } else if (typeof value === "number" || typeof value === "boolean") {
-    return value.toString();
-  } else if (Array.isArray(value)) {
-    return value.length ? `[${value[0]}]` : `[]`;
-  } else if (value === null) {
-    return "null";
-  } else if (value === undefined) {
-    return "undefined";
-  } else if (isNaN(value) && typeof value !== "object") {
-    return "NaN";
-  } else if (value === Infinity) {
-    return "Infinity";
-  } else if (typeof value === "object") {
-    return "{}";
-  } else {
-    return String(value);
-  }
+export const calculation = (first: any, second: any, operator: OperatorType) => {
+  let result;
+  if (operator === "+") result = first + second;
+  else if (operator === "-") result = first - second;
+  else if (operator === "/") result = first / second;
+  else if (operator === "*") result = first * second;
+  else if (operator === "**") result = first ** second;
+  else if (operator === "==") result = first == second;
+  else if (operator === "===") result = first === second;
+  return showResult(result);
 };
 
-const convertToPars = (value: any): null | undefined | object | [] | string | number | boolean => {
-  if (/(['"]).*\1/g.test(value)) {
-    const replaceValue = value.replace(/(['"])["']{2}\1/g, "");
-    return JSON.parse(replaceValue);
-  } else if (value.includes("[") && value.includes("]")) {
-    const firstIndex = value.indexOf("[") + 1;
-    let lastIndex = value.indexOf(",");
-    if (lastIndex === -1) lastIndex = value.indexOf("]");
-    const indexOneValue = value.slice(firstIndex, lastIndex);
-    return indexOneValue ? [convertToPars(indexOneValue)] : [];
-  } else if (value.includes("{") && value.includes("}")) {
-    return {};
-  } else if (value === "null") {
-    return null;
-  } else if (value === "undefined") {
-    return undefined;
-  } else if (value === "NaN") {
-    return NaN;
-  } else if (value === "Infinity") {
-    return Infinity;
-  } else if (value && (value === "false" || value === "true" || !isNaN(value))) {
-    return JSON.parse(value);
-  } else {
-    return value;
-  }
-};
-
-const calculation = (first: any, second: any, operator: OperatorType) => {
-  if (operator === "+") return first + second;
-  else if (operator === "-") return first - second;
-  else if (operator === "/") return first / second;
-  else if (operator === "*") return first * second;
-  else if (operator === "**") return first ** second;
-  else if (operator === "==") return first == second;
-  else if (operator === "===") return first === second;
-};
-
-const showResult = (first: any, second: any, operator: OperatorType) => {
-  const result = calculation(first, second, operator);
+const showResult = (result: string | boolean | number) => {
   if (result === true) return <span className="bg-green-200 text-green-500">true</span>;
   else if (result === false) return <span className="bg-red-200 text-red-700">false</span>;
   else if (typeof result === "string")
@@ -143,51 +32,39 @@ const showResult = (first: any, second: any, operator: OperatorType) => {
   else if (typeof result === "number") return <span className="bg-amber-200 text-amber-700">{result}</span>;
 };
 
-const defaultHeader = headerOptions.reduce((prev, current, index) => {
-  prev = { ...prev, [current]: convertToString(defaultValue[index]) };
-  return prev;
-}, {});
-
-const defaultBody = bodyOptions.reduce((prev, current, index) => {
-  prev = { ...prev, [current]: convertToString(defaultValue[index]) };
-  return prev;
-}, {});
-
 const Page = () => {
-  const [data, setData] = useState<{ body: {}; header: {}; operator: OperatorType }>({
-    body: defaultBody,
-    header: defaultHeader,
+  const [data, setData] = useState<DataType>({
+    body: defaultValueBody.params,
+    header: defaultValueHeader.params,
     operator: "==",
   });
+  const [value, setValue] = useState<ValueType>({ header: defaultValueHeader.string, body: defaultValueBody.string });
 
-  const [hederValue, setHeaderValue] = useState(defaultHeader);
-  const [bodyValue, setBodyValue] = useState(defaultBody);
-
-  const onChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+  const onChange: React.ChangeEventHandler<HTMLInputElement> = useCallback((e) => {
     const { name, value } = e.target;
-    if (name.includes("header")) setHeaderValue((prev) => ({ ...prev, [name]: value }));
-    else setBodyValue((prev) => ({ ...prev, [name]: value }));
-  };
+    if (name.includes("header")) setValue((prev) => ({ ...prev, header: { ...prev.header, [name]: value } }));
+    else setValue((prev) => ({ ...prev, body: { ...prev.body, [name]: value } }));
+  }, []);
 
-  const onClick = (item: OperatorType) => {
-    let body = {};
-    let header = {};
+  const onClick = useCallback(
+    (item: OperatorType) => {
+      let body: AnyObject = {};
+      let header: AnyObject = {};
 
-    for (let key in bodyValue) body[key] = convertToPars(bodyValue[key]);
+      for (let key in value.body) body = { ...body, [key]: convertToPars(value.body[key]) };
+      for (let key in value.header) header = { ...header, [key]: convertToPars(value.header[key]) };
 
-    for (let key in hederValue) header[key] = convertToPars(hederValue[key]);
+      let bodyValue: AnyObject = {};
+      let headerValue: AnyObject = {};
 
-    let _bodyValue = {};
-    let _headerValue = {};
+      for (let key in body) bodyValue = { ...bodyValue, [key]: convertToString(body[key]) };
+      for (let key in header) headerValue = { ...headerValue, [key]: convertToString(header[key]) };
 
-    for (let key in body) _bodyValue[key] = convertToString(body[key]);
-    for (let key in header) _headerValue[key] = convertToString(header[key]);
-
-    setBodyValue(_bodyValue);
-    setHeaderValue(_headerValue);
-
-    setData({ operator: item, body, header });
-  };
+      setValue({ body: bodyValue, header: headerValue });
+      setData({ operator: item, body, header });
+    },
+    [value.body, value.header]
+  );
 
   return (
     <section className="p-4">
@@ -215,12 +92,12 @@ const Page = () => {
             <thead>
               <tr>
                 <th className="text-2xl">{data.operator}</th>
-                {headerOptions.map((item, index) => {
+                {tableOptions.header.map((item, index) => {
                   return (
                     <th key={`1-${index}-${data}`} className="p-3">
                       <input
                         className="bg-transparent text-center w-[80px]"
-                        value={hederValue[item]}
+                        value={value.header[item]}
                         name={item}
                         onChange={onChange}
                       />
@@ -230,21 +107,21 @@ const Page = () => {
               </tr>
             </thead>
             <tbody>
-              {bodyOptions.map((bodyItem, index) => {
+              {tableOptions.body.map((bodyItem, index) => {
                 return (
                   <tr key={`2-${index}-${data}`}>
                     <th className="px-3">
                       <input
                         className="bg-transparent text-center w-[80px]"
-                        value={bodyValue[bodyItem]}
+                        value={value.body[bodyItem]}
                         name={bodyItem}
                         onChange={onChange}
                       />
                     </th>
-                    {headerOptions.map((headerItem, titleIndex) => {
+                    {tableOptions.header.map((headerItem, titleIndex) => {
                       return (
                         <td key={`3-${headerItem}-${titleIndex}-${data}`}>
-                          {showResult(data.body[bodyItem], data.header[headerItem], data.operator)}
+                          {calculation(data.body[bodyItem], data.header[headerItem], data.operator)}
                         </td>
                       );
                     })}
