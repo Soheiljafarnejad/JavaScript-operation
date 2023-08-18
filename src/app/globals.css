@@ -2,26 +2,119 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+* {
+  scrollbar-width: 10px;
+  scrollbar-color: #c0c0c0 #ffffff;
+  behavior: "smooth";
+}
+*::-webkit-scrollbar {
+  width: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: #c0c0c0;
+  border-radius: 40px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+html {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: text;
+}
+
+@layer {
+  span {
+    @apply text-center centering text-sm min-w-[50px] min-h-[30px] p-1 whitespace-nowrap;
+  }
+  table {
+    @apply border-separate border border-slate-800 rounded-md overflow-hidden bg-white/50;
+  }
+  th {
+    @apply border border-black font-medium;
+  }
+
+  td {
+    @apply border border-black;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+@layer utilities {
+  .transition {
+    @apply transition-all duration-300;
+  }
+  .max-h-screen {
+    @apply max-h-[100svh];
+  }
+  .min-h-screen {
+    @apply min-h-[100svh];
+  }
+  .max-w-layout {
+    @apply max-w-[1200px]  mx-auto;
+  }
+  .h-screen {
+    @apply h-[100svh];
+  }
+}
+
+@layer components {
+  .absolute-start-start {
+    @apply absolute right-0 rtl:left-0 top-0;
+  }
+  .absolute-start-center {
+    @apply absolute right-0 rtl:left-0 top-1/2 -translate-y-1/2;
+  }
+  .absolute-start-end {
+    @apply absolute right-0 rtl:left-0 bottom-0;
+  }
+  .absolute-end-start {
+    @apply absolute left-0 rtl:right-0 top-0;
+  }
+  .absolute-end-center {
+    @apply absolute left-0 rtl:right-0 top-1/2 -translate-y-1/2;
+  }
+  .absolute-centering {
+    @apply absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2;
+  }
+  .flex-start-center {
+    @apply flex justify-start items-center;
+  }
+  .flex-start-start {
+    @apply flex justify-start items-start;
+  }
+  .flex-start-end {
+    @apply flex justify-start items-end;
+  }
+  .flex-start-between {
+    @apply flex justify-start items-end;
+  }
+  .flex-end-center {
+    @apply flex justify-end items-center;
+  }
+  .flex-end-start {
+    @apply flex justify-end items-start;
+  }
+  .flex-end-end {
+    @apply flex justify-end items-end;
+  }
+  .flex-end-between {
+    @apply flex justify-end items-end;
+  }
+  .flex-between-center {
+    @apply flex justify-between items-center;
+  }
+  .flex-between-start {
+    @apply flex justify-between items-start;
+  }
+  .flex-between-end {
+    @apply flex justify-between items-end;
+  }
+  .centering {
+    @apply !flex !justify-center !items-center;
+  }
 }
