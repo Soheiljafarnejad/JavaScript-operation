@@ -10,9 +10,16 @@ type OperatorType = "+" | "-" | "*" | "**" | "/" | "==" | "===";
 type DataType = { body: AnyObject; header: AnyObject; operator: OperatorType };
 type ValueType = { body: AnyObject; header: AnyObject };
 
-const operator: OperatorType[] = ["+", "-", "*", "**", "/", "==", "==="];
+const operator: OperatorType[] = ["==", "===", "+", "-", "*", "**", "/"];
 
-export const calculation = (first: any, second: any, operator: OperatorType) => {
+const labelColorOptions = {
+  true: "bg-green-200 text-green-700",
+  false: "bg-red-200 text-red-700",
+  string: "bg-purple-200 text-purple-700",
+  number: "bg-amber-200 text-amber-700",
+};
+
+export const calculation = (first: any, second: any, operator: OperatorType): React.JSX.Element => {
   let result;
   if (operator === "+") result = first + second;
   else if (operator === "-") result = first - second;
@@ -25,11 +32,12 @@ export const calculation = (first: any, second: any, operator: OperatorType) => 
 };
 
 const showResult = (result: string | boolean | number) => {
-  if (result === true) return <span className="bg-green-200 text-green-500">true</span>;
-  else if (result === false) return <span className="bg-red-200 text-red-700">false</span>;
-  else if (typeof result === "string")
-    return <span className="bg-purple-200 text-purple-700">{result === "" ? `""` : result}</span>;
-  else if (typeof result === "number") return <span className="bg-amber-200 text-amber-700">{result}</span>;
+  let data = { value: "", className: "" };
+  if (result === true) data = { value: "true", className: labelColorOptions.true };
+  else if (result === false) data = { value: "false", className: labelColorOptions.false };
+  else if (typeof result === "string") data = { value: result === "" ? `""` : result, className: labelColorOptions.string };
+  else if (typeof result === "number") data = { value: `${result}`, className: labelColorOptions.number };
+  return <span className={data.className}>{data.value}</span>;
 };
 
 const Page = () => {
@@ -67,10 +75,10 @@ const Page = () => {
   );
 
   return (
-    <section className="p-4">
-      <h1 className="centering text-4xl mb-4">JavaScript coercion rules</h1>
+    <section className="px-4 py-8">
+      <h1 className="centering text-center text-3xl md:text-4xl mb-6">JavaScript coercion rules</h1>
 
-      <ul className="centering gap-4 max-w-3xl mx-auto mb-4">
+      <ul className="centering flex-wrap gap-4 max-w-3xl mx-auto mb-4">
         {operator.map((item) => {
           return (
             <li
@@ -78,7 +86,7 @@ const Page = () => {
               onClick={() => onClick(item)}
               className={`text-xl rounded-md transition-all duration-400  ${
                 data.operator === item ? "bg-blue-50" : "bg-white/50"
-              } centering h-10 w-10 cursor-pointer`}
+              } centering h-12 w-12 cursor-pointer`}
             >
               {item}
             </li>
