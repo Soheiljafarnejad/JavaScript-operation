@@ -1,6 +1,6 @@
 "use client";
-import React, { useCallback, useState } from "react";
-import { convertToPars, convertToString, defaultValueBody, defaultValueHeader, tableOptions } from "../utils/utils";
+import React, { useCallback, useEffect, useState } from "react";
+import { convertToPars, convertToString, createDefaultValue } from "../utils/utils";
 
 type AnyObject = {
   [key: string]: any;
@@ -41,12 +41,19 @@ const showResult = (result: string | boolean | number) => {
 };
 
 const Page = () => {
+  const [table, setTable] = useState(createDefaultValue(20));
+  const [input, setInput] = useState<{ search: string; operator: OperatorType }>({ search: "20", operator: "==" });
+
   const [data, setData] = useState<DataType>({
-    body: defaultValueBody.params,
-    header: defaultValueHeader.params,
+    body: table.object.body.pars,
+    header: table.object.header.pars,
     operator: "==",
   });
-  const [value, setValue] = useState<ValueType>({ header: defaultValueHeader.string, body: defaultValueBody.string });
+
+  const [value, setValue] = useState<ValueType>({
+    header: table.object.header.stringify,
+    body: table.object.body.stringify,
+  });
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = useCallback((e) => {
     const { name, value } = e.target;
@@ -54,53 +61,76 @@ const Page = () => {
     else setValue((prev) => ({ ...prev, body: { ...prev.body, [name]: value } }));
   }, []);
 
-  const onClick = useCallback(
-    (item: OperatorType) => {
-      let body: AnyObject = {};
-      let header: AnyObject = {};
+  const onClick = useCallback(() => {
+    let body: AnyObject = {};
+    let header: AnyObject = {};
+    let bodyValue: AnyObject = {};
+    let headerValue: AnyObject = {};
 
-      for (let key in value.body) body = { ...body, [key]: convertToPars(value.body[key]) };
-      for (let key in value.header) header = { ...header, [key]: convertToPars(value.header[key]) };
+    for (let key in value.body) {
+      const parsValue = convertToPars(value.body[key]);
+      body = { ...body, [key]: parsValue };
+      bodyValue = { ...bodyValue, [key]: convertToString(parsValue) };
+    }
 
-      let bodyValue: AnyObject = {};
-      let headerValue: AnyObject = {};
-
-      for (let key in body) bodyValue = { ...bodyValue, [key]: convertToString(body[key]) };
-      for (let key in header) headerValue = { ...headerValue, [key]: convertToString(header[key]) };
-
-      setValue({ body: bodyValue, header: headerValue });
-      setData({ operator: item, body, header });
-    },
-    [value.body, value.header]
-  );
+    for (let key in value.header) {
+      const parsValue = convertToPars(value.header[key]);
+      header = { ...header, [key]: parsValue };
+      headerValue = { ...headerValue, [key]: convertToString(parsValue) };
+    }
+    setTable(createDefaultValue(input.search));
+    setValue({ body: bodyValue, header: headerValue });
+    setData({ operator: input.operator, body, header });
+  }, [input, value]);
 
   return (
-    <section className="px-4 py-8">
-      <h1 className="centering text-center text-3xl md:text-4xl mb-6">JavaScript coercion rules</h1>
+    <section className="px-4 py-6">
+      <h1 className="centering text-center text-3xl md:text-4xl mb-6">JavaScript Coercion Rules</h1>
 
-      <ul className="centering flex-wrap gap-4 max-w-3xl mx-auto mb-4">
-        {operator.map((item) => {
-          return (
-            <li
-              key={item}
-              onClick={() => onClick(item)}
-              className={`text-xl rounded-md transition-all duration-400  ${
-                data.operator === item ? "bg-blue-50" : "bg-white/50"
-              } centering h-12 w-12 cursor-pointer`}
-            >
-              {item}
-            </li>
-          );
-        })}
-      </ul>
+      <div className="flex-start-center flex-col md:flex-row gap-6 max-w-screen-xl mx-auto">
+        <div className="centering gap-4">
+          <button className="h-10 px-8 bg-white rounded-md shadow-md" onClick={onClick}>
+            Submit
+          </button>
+          <input
+            className="md:hidden h-10 px-4 bg-white rounded-md w-20 text-center shadow-md"
+            value={input.search}
+            onChange={(e) => setInput((prev) => ({ ...prev, search: e.target.value }))}
+          />
+        </div>
+
+        <ul className="centering flex-wrap gap-4 max-w-xl mx-auto flex-1">
+          {operator.map((item) => {
+            return (
+              <li
+                key={item}
+                onClick={() => setInput((prev) => ({ ...prev, operator: item }))}
+                className={`text-lg rounded-md transition-all duration-400 shadow-md ${
+                  input.operator === item ? "bg-blue-50" : "bg-white/50"
+                } centering h-10 w-10 cursor-pointer`}
+              >
+                {item}
+              </li>
+            );
+          })}
+        </ul>
+
+        <div className="hidden md:flex-end-center">
+          <input
+            className="h-10 px-4 bg-white rounded-md w-20 text-center shadow-md"
+            value={input.search}
+            onChange={(e) => setInput((prev) => ({ ...prev, search: e.target.value }))}
+          />
+        </div>
+      </div>
 
       <div className="centering">
-        <div className="overflow-auto p-4">
+        <div className="overflow-auto py-4">
           <table>
             <thead>
               <tr>
                 <th className="text-2xl">{data.operator}</th>
-                {tableOptions.header.map((item, index) => {
+                {table.array.header.map((item, index) => {
                   return (
                     <th key={`1-${index}-${data}`} className="p-3">
                       <input
@@ -115,7 +145,7 @@ const Page = () => {
               </tr>
             </thead>
             <tbody>
-              {tableOptions.body.map((bodyItem, index) => {
+              {table.array.body.map((bodyItem, index) => {
                 return (
                   <tr key={`2-${index}-${data}`}>
                     <th className="px-3">
@@ -126,7 +156,7 @@ const Page = () => {
                         onChange={onChange}
                       />
                     </th>
-                    {tableOptions.header.map((headerItem, titleIndex) => {
+                    {table.array.header.map((headerItem, titleIndex) => {
                       return (
                         <td key={`3-${headerItem}-${titleIndex}-${data}`}>
                           {calculation(data.body[bodyItem], data.header[headerItem], data.operator)}

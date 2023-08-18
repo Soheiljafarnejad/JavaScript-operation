@@ -1,57 +1,6 @@
-type CountOptionsType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20;
-
-type BodyOptionType = `body${CountOptionsType}`;
-type HeaderOptionType = `header${CountOptionsType}`;
-
-const bodyOptions: BodyOptionType[] = [
-  "body1",
-  "body2",
-  "body3",
-  "body4",
-  "body5",
-  "body6",
-  "body7",
-  "body8",
-  "body9",
-  "body10",
-  "body11",
-  "body12",
-  "body13",
-  "body14",
-  "body15",
-  "body16",
-  "body17",
-  "body18",
-  "body19",
-  "body20",
-];
-
-const headerOptions: HeaderOptionType[] = [
-  "header1",
-  "header2",
-  "header3",
-  "header4",
-  "header5",
-  "header6",
-  "header7",
-  "header8",
-  "header9",
-  "header10",
-  "header11",
-  "header12",
-  "header13",
-  "header14",
-  "header15",
-  "header16",
-  "header17",
-  "header18",
-  "header19",
-  "header20",
-];
-
-export const tableOptions: { body: BodyOptionType[]; header: HeaderOptionType[] } = {
-  body: bodyOptions,
-  header: headerOptions,
+type initialType = {
+  array: { body: any[]; header: any[] };
+  object: { header: { stringify: {}; pars: {} }; body: { stringify: {}; pars: {} } };
 };
 
 export const convertToString = (value: any): string => {
@@ -60,7 +9,7 @@ export const convertToString = (value: any): string => {
   } else if (typeof value === "number" || typeof value === "boolean") {
     return value.toString();
   } else if (Array.isArray(value)) {
-    return value.length ? `[${value[0]}]` : `[]`;
+    return value.length ? `[${convertToString(value[0])}]` : `[]`;
   } else if (value === null) {
     return "null";
   } else if (value === undefined) {
@@ -76,10 +25,14 @@ export const convertToString = (value: any): string => {
   }
 };
 
-export const convertToPars = (value: any): null | undefined | object | [] | string | number | boolean => {
+export const convertToPars = (value: any): null | undefined | {} | [] | string | number | boolean => {
   if (/(['"]).*\1/g.test(value)) {
     let newValue = value.replace(/(['"])["']{2}\1/g, "");
-    return JSON.parse(newValue);
+    try {
+      return JSON.parse(newValue);
+    } catch (error) {
+      return undefined;
+    }
   } else if (value.includes("[") && value.includes("]")) {
     const firstIndex = value.indexOf("[") + 1;
     let lastIndex = value.indexOf(",");
@@ -101,7 +54,7 @@ export const convertToPars = (value: any): null | undefined | object | [] | stri
   } else if (value && !isNaN(value)) {
     return Number(value);
   } else {
-    return value;
+    return undefined;
   }
 };
 
@@ -112,22 +65,27 @@ const defaultValue = () => {
 const HeaderDefaultValue = defaultValue();
 const bodyDefaultValue = defaultValue();
 
-export const defaultValueHeader = tableOptions.header.reduce(
-  (prev, current, index) => {
-    prev.string = { ...prev.string, [current]: convertToString(HeaderDefaultValue[index]) };
-    prev.params = { ...prev.params, [current]: HeaderDefaultValue[index] };
+export const createDefaultValue = (total: number | string = 20) => {
+  const _total = isNaN(+total) || +total > 20 ? 20 : +total;
 
-    return prev;
-  },
-  { string: {}, params: {} }
-);
+  let initial: initialType = {
+    array: { body: [], header: [] },
+    object: { header: { stringify: {}, pars: {} }, body: { stringify: {}, pars: {} } },
+  };
 
-export const defaultValueBody = tableOptions.body.reduce(
-  (prev, current, index) => {
-    prev.string = { ...prev.string, [current]: convertToString(bodyDefaultValue[index]) };
-    prev.params = { ...prev.params, [current]: bodyDefaultValue[index] };
+  for (let i = 0; i < _total; i++) {
+    initial.array.body.push(`body${i}`);
+    initial.array.header.push(`header${i}`);
 
-    return prev;
-  },
-  { string: {}, params: {} }
-);
+    initial.object.body.stringify = { ...initial.object.body.stringify, [`body${i}`]: convertToString(bodyDefaultValue[i]) };
+    initial.object.header.stringify = {
+      ...initial.object.header.stringify,
+      [`header${i}`]: convertToString(HeaderDefaultValue[i]),
+    };
+
+    initial.object.body.pars = { ...initial.object.body.pars, [`body${i}`]: bodyDefaultValue[i] };
+    initial.object.header.pars = { ...initial.object.header.pars, [`header${i}`]: HeaderDefaultValue[i] };
+  }
+
+  return initial;
+};

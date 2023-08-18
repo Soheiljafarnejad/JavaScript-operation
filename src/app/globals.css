@@ -38,9 +38,11 @@ html {
   th {
     @apply border border-black font-medium;
   }
-
   td {
     @apply border border-black;
+  }
+  input {
+    @apply !border-none !outline-none;
   }
 }
 
