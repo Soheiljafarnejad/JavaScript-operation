@@ -84,12 +84,16 @@ const Page = () => {
     setValue({ body: bodyValue, header: headerValue });
     setData({ operator: input.operator, body, header });
 
-    toast.success("success");
+    toast.success("Success 🎉");
   }, [input, value]);
 
   return (
     <SimpleBar autoHide={false} className="max-h-screen w-full">
       <section className="p-4 max-w-[1500px] mx-auto">
+        <h1 className="centering text-center text-2xl sm:text-3xl md:text-4xl mb-4 text-white font-bold">
+          JavaScript Coercion Rules
+        </h1>
+
         <ul className="text-white font-medium mb-4">
           <li className="flex-start-center gap-2">
             <span className="text-lg sm:text-2xl">Guide :</span>
@@ -102,11 +106,9 @@ const Page = () => {
           </li>
           <li className="sm:text-lg">1) You can change the value of each row and column</li>
           <li className="sm:text-lg">2) You can change the Operator</li>
+          <li className="sm:text-lg">3) You can change the row count</li>
           <div className="h-[1.5px] w-full bg-white mt-4"></div>
         </ul>
-        <h1 className="centering text-center text-2xl sm:text-3xl md:text-4xl mb-4 text-white font-bold">
-          JavaScript Coercion Rules
-        </h1>
 
         <div className="flex-between-center gap-4 md:gap-6 mx-auto mb-8">
           <div className="flex-end-center gap-2">
