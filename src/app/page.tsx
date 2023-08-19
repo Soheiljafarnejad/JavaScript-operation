@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { convertToPars, convertToString, createDefaultValue } from "../utils/utils";
 import SimpleBar from "simplebar-react";
 import { toast } from "react-hot-toast";
@@ -108,7 +108,7 @@ const Page = () => {
           JavaScript Coercion Rules
         </h1>
 
-        <div className="flex-between-center gap-4 md:gap-6 mx-auto mb-6">
+        <div className="flex-between-center gap-4 md:gap-6 mx-auto mb-8">
           <div className="flex-end-center gap-2">
             <p className="whitespace-nowrap text-white font-medium">Row Count : </p>
             <input
