@@ -33,7 +33,7 @@ html {
     @apply text-center centering text-sm min-w-[50px] min-h-[30px] p-1 whitespace-nowrap;
   }
   table {
-    @apply border-separate border border-slate-800 rounded-md overflow-hidden bg-white/50;
+    @apply border-separate border border-slate-800 rounded-md  bg-white/50;
   }
   th {
     @apply border border-black font-medium;
@@ -42,7 +42,10 @@ html {
     @apply border border-black;
   }
   input {
-    @apply !border-none !outline-none;
+    @apply !border !outline-none !text-center !bg-white/50 !border-white;
+  }
+  select {
+    @apply !border !outline-none !text-center !bg-white/50 !border-white w-full cursor-pointer;
   }
 }
 

@@ -1,6 +1,8 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
 import { convertToPars, convertToString, createDefaultValue } from "../utils/utils";
+import SimpleBar from "simplebar-react";
+import { toast } from "react-hot-toast";
 
 type AnyObject = {
   [key: string]: any;
@@ -81,96 +83,96 @@ const Page = () => {
     setTable(createDefaultValue(input.search));
     setValue({ body: bodyValue, header: headerValue });
     setData({ operator: input.operator, body, header });
+
+    toast.success("success");
   }, [input, value]);
 
   return (
-    <section className="px-4 py-6">
-      <h1 className="centering text-center text-3xl md:text-4xl mb-6">JavaScript Coercion Rules</h1>
+    <SimpleBar autoHide={false} className="max-h-screen w-full">
+      <section className="p-4 max-w-[1500px] mx-auto">
+        <ul className="text-white font-medium mb-4">
+          <li className="flex-start-center gap-2">
+            <span className="text-lg sm:text-2xl">Guide :</span>
+            <ul className="flex-start-center gap-2 flex-1 [&>*]:rounded-md [&>*]:py-0.5 [&>*]:px-1 [&>*]:sm:px-3">
+              <li className={labelColorOptions.false}>false</li>
+              <li className={labelColorOptions.true}>true</li>
+              <li className={labelColorOptions.string}>string</li>
+              <li className={labelColorOptions.number}>number</li>
+            </ul>
+          </li>
+          <li className="sm:text-lg">1) You can change the value of each row and column</li>
+          <li className="sm:text-lg">2) You can change the Operator</li>
+          <div className="h-[1.5px] w-full bg-white mt-4"></div>
+        </ul>
+        <h1 className="centering text-center text-2xl sm:text-3xl md:text-4xl mb-4 text-white font-bold">
+          JavaScript Coercion Rules
+        </h1>
 
-      <div className="flex-start-center flex-col md:flex-row gap-6 max-w-screen-xl mx-auto">
-        <div className="centering gap-4">
-          <button className="h-10 px-8 bg-white rounded-md shadow-md" onClick={onClick}>
+        <div className="flex-between-center gap-4 md:gap-6 mx-auto mb-6">
+          <div className="flex-end-center gap-2">
+            <p className="whitespace-nowrap text-white font-medium">Row Count : </p>
+            <input
+              className="w-full max-w-[80px] h-8 rounded-md text-center shadow-md"
+              value={input.search}
+              onChange={(e) => setInput((prev) => ({ ...prev, search: e.target.value }))}
+            />
+          </div>
+          <button className="h-8 w-[90px] bg-white rounded-md shadow-md font-medium" onClick={onClick}>
             Submit
           </button>
-          <input
-            className="md:hidden h-10 px-4 bg-white rounded-md w-20 text-center shadow-md"
-            value={input.search}
-            onChange={(e) => setInput((prev) => ({ ...prev, search: e.target.value }))}
-          />
         </div>
 
-        <ul className="centering flex-wrap gap-4 max-w-xl mx-auto flex-1">
-          {operator.map((item) => {
-            return (
-              <li
-                key={item}
-                onClick={() => setInput((prev) => ({ ...prev, operator: item }))}
-                className={`text-lg rounded-md transition-all duration-400 shadow-md ${
-                  input.operator === item ? "bg-blue-50" : "bg-white/50"
-                } centering h-10 w-10 cursor-pointer`}
-              >
-                {item}
-              </li>
-            );
-          })}
-        </ul>
-
-        <div className="hidden md:flex-end-center">
-          <input
-            className="h-10 px-4 bg-white rounded-md w-20 text-center shadow-md"
-            value={input.search}
-            onChange={(e) => setInput((prev) => ({ ...prev, search: e.target.value }))}
-          />
-        </div>
-      </div>
-
-      <div className="centering">
-        <div className="overflow-auto py-4">
-          <table>
-            <thead>
-              <tr>
-                <th className="text-2xl">{data.operator}</th>
-                {table.array.header.map((item, index) => {
+        <div className="centering">
+          <SimpleBar autoHide={false} className="max-h-[80svh] w-full">
+            <table className="mx-auto">
+              <thead>
+                <tr>
+                  <th>
+                    <select
+                      onChange={(e) => setInput((prev) => ({ ...prev, operator: e.target.value as OperatorType }))}
+                      value={input.operator}
+                    >
+                      {operator.map((item) => {
+                        return (
+                          <option key={item} value={item}>
+                            {item}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </th>
+                  {table.array.header.map((item, index) => {
+                    return (
+                      <th key={`1-${index}-${data}`}>
+                        <input value={value.header[item]} name={item} onChange={onChange} />
+                      </th>
+                    );
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {table.array.body.map((bodyItem, index) => {
                   return (
-                    <th key={`1-${index}-${data}`} className="p-3">
-                      <input
-                        className="bg-transparent text-center w-[80px]"
-                        value={value.header[item]}
-                        name={item}
-                        onChange={onChange}
-                      />
-                    </th>
+                    <tr key={`2-${index}-${data}`}>
+                      <th>
+                        <input value={value.body[bodyItem]} name={bodyItem} onChange={onChange} />
+                      </th>
+                      {table.array.header.map((headerItem, titleIndex) => {
+                        return (
+                          <td key={`3-${headerItem}-${titleIndex}-${data}`}>
+                            {calculation(data.body[bodyItem], data.header[headerItem], data.operator)}
+                          </td>
+                        );
+                      })}
+                    </tr>
                   );
                 })}
-              </tr>
-            </thead>
-            <tbody>
-              {table.array.body.map((bodyItem, index) => {
-                return (
-                  <tr key={`2-${index}-${data}`}>
-                    <th className="px-3">
-                      <input
-                        className="bg-transparent text-center w-[80px]"
-                        value={value.body[bodyItem]}
-                        name={bodyItem}
-                        onChange={onChange}
-                      />
-                    </th>
-                    {table.array.header.map((headerItem, titleIndex) => {
-                      return (
-                        <td key={`3-${headerItem}-${titleIndex}-${data}`}>
-                          {calculation(data.body[bodyItem], data.header[headerItem], data.operator)}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </SimpleBar>
         </div>
-      </div>
-    </section>
+      </section>
+    </SimpleBar>
   );
 };
 

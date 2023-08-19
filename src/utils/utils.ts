@@ -31,7 +31,7 @@ export const convertToPars = (value: any): null | undefined | {} | [] | string |
     try {
       return JSON.parse(newValue);
     } catch (error) {
-      return undefined;
+      return String(newValue);
     }
   } else if (value.includes("[") && value.includes("]")) {
     const firstIndex = value.indexOf("[") + 1;
@@ -66,7 +66,7 @@ const HeaderDefaultValue = defaultValue();
 const bodyDefaultValue = defaultValue();
 
 export const createDefaultValue = (total: number | string = 20) => {
-  const _total = isNaN(+total) || +total > 20 ? 20 : +total;
+  const _total = isNaN(+total) || +total > 20 ? 20 : +total === 0 ? 1 : +total;
 
   let initial: initialType = {
     array: { body: [], header: [] },
