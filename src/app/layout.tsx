@@ -7,8 +7,8 @@ import { Toaster } from "react-hot-toast";
 const font = Source_Sans_3({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "javascript operation",
-  description: "javascript operation",
+  title: "Javascript Operation",
+  description: "Javascript Operation",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
