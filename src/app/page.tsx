@@ -39,7 +39,7 @@ const showResult = (result: string | boolean | number) => {
   else if (result === false) data = { value: "false", className: labelColorOptions.false };
   else if (typeof result === "string") data = { value: result === "" ? `""` : result, className: labelColorOptions.string };
   else if (typeof result === "number") data = { value: `${result}`, className: labelColorOptions.number };
-  return <span className={data.className}>{data.value}</span>;
+  return <span className={`font-medium ${data.className}`}>{data.value}</span>;
 };
 
 const Page = () => {
@@ -109,6 +109,9 @@ const Page = () => {
         </h1>
 
         <div className="flex-between-center gap-4 md:gap-6 mx-auto mb-8">
+          <button className="h-8 w-[90px] bg-white rounded-md shadow-md font-medium" onClick={onClick}>
+            Submit
+          </button>
           <div className="flex-end-center gap-2">
             <p className="whitespace-nowrap text-white font-medium">Row Count : </p>
             <input
@@ -117,9 +120,6 @@ const Page = () => {
               onChange={(e) => setInput((prev) => ({ ...prev, search: e.target.value }))}
             />
           </div>
-          <button className="h-8 w-[90px] bg-white rounded-md shadow-md font-medium" onClick={onClick}>
-            Submit
-          </button>
         </div>
 
         <div className="centering">
