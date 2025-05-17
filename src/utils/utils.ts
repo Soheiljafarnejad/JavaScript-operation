@@ -3,13 +3,13 @@ type initialType = {
   object: { header: { stringify: {}; pars: {} }; body: { stringify: {}; pars: {} } };
 };
 
-export const convertToString = (value: any): string => {
+export const stringify = (value: any): string => {
   if (typeof value === "string") {
     return `"${value}"`;
   } else if (typeof value === "number" || typeof value === "boolean") {
     return value.toString();
   } else if (Array.isArray(value)) {
-    return value.length ? `[${convertToString(value[0])}]` : `[]`;
+    return value.length ? `[${stringify(value[0])}]` : `[]`;
   } else if (value === null) {
     return "null";
   } else if (value === undefined) {
@@ -25,7 +25,7 @@ export const convertToString = (value: any): string => {
   }
 };
 
-export const convertToPars = (value: any): null | undefined | {} | [] | string | number | boolean => {
+export const parser = (value: any): null | undefined | {} | [] | string | number | boolean => {
   if (/(['"]).*\1/g.test(value)) {
     let newValue = value.replace(/(['"])["']{2}\1/g, "");
     try {
@@ -38,7 +38,7 @@ export const convertToPars = (value: any): null | undefined | {} | [] | string |
     let lastIndex = value.indexOf(",");
     if (lastIndex === -1) lastIndex = value.indexOf("]");
     const indexOneValue = value.slice(firstIndex, lastIndex);
-    return indexOneValue ? [convertToPars(indexOneValue)] : [];
+    return indexOneValue ? [parser(indexOneValue)] : [];
   } else if (value.includes("{") && value.includes("}")) {
     return {};
   } else if (value === "null") {
@@ -77,10 +77,10 @@ export const createDefaultValue = (total: number | string = 20) => {
     initial.array.body.push(`body${i}`);
     initial.array.header.push(`header${i}`);
 
-    initial.object.body.stringify = { ...initial.object.body.stringify, [`body${i}`]: convertToString(bodyDefaultValue[i]) };
+    initial.object.body.stringify = { ...initial.object.body.stringify, [`body${i}`]: stringify(bodyDefaultValue[i]) };
     initial.object.header.stringify = {
       ...initial.object.header.stringify,
-      [`header${i}`]: convertToString(HeaderDefaultValue[i]),
+      [`header${i}`]: stringify(HeaderDefaultValue[i]),
     };
 
     initial.object.body.pars = { ...initial.object.body.pars, [`body${i}`]: bodyDefaultValue[i] };

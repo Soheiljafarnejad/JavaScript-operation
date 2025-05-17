@@ -8,7 +8,7 @@ const font = Source_Sans_3({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Javascript Operation",
-  description: "Javascript Operation",
+  description: "An interactive tool to explore and understand JavaScript Type Coercion using different values and operators.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

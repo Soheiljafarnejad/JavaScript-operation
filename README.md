@@ -17,6 +17,9 @@ An interactive tool to explore and understand **JavaScript Type Coercion** using
 
 ```bash
 git clone https://github.com/Soheiljafarnejad/javascript-operation.git
+```
+
+```bash
 cd javascript-operation
 ```
 
@@ -24,5 +27,8 @@ cd javascript-operation
 
 ```bash
 npm i
+```
+
+```bash
 npm run dev
 ```

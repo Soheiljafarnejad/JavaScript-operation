@@ -1,8 +1,9 @@
 "use client";
-import React, { useCallback, useState } from "react";
-import { convertToPars, convertToString, createDefaultValue } from "../utils/utils";
+import React, { FormEventHandler, useCallback, useState } from "react";
+import { parser, stringify, createDefaultValue } from "../utils/utils";
 import SimpleBar from "simplebar-react";
 import { toast } from "react-hot-toast";
+import Link from "next/link";
 
 type AnyObject = {
   [key: string]: any;
@@ -46,16 +47,9 @@ const Page = () => {
   const [table, setTable] = useState(createDefaultValue(20));
   const [input, setInput] = useState<{ search: string; operator: OperatorType }>({ search: "20", operator: "==" });
 
-  const [data, setData] = useState<DataType>({
-    body: table.object.body.pars,
-    header: table.object.header.pars,
-    operator: "==",
-  });
+  const [data, setData] = useState<DataType>({ body: table.object.body.pars, header: table.object.header.pars, operator: "==" });
 
-  const [value, setValue] = useState<ValueType>({
-    header: table.object.header.stringify,
-    body: table.object.body.stringify,
-  });
+  const [value, setValue] = useState<ValueType>({ header: table.object.header.stringify, body: table.object.body.stringify });
 
   const onChange: React.ChangeEventHandler<HTMLInputElement> = useCallback((e) => {
     const { name, value } = e.target;
@@ -63,36 +57,38 @@ const Page = () => {
     else setValue((prev) => ({ ...prev, body: { ...prev.body, [name]: value } }));
   }, []);
 
-  const onClick = useCallback(() => {
-    let body: AnyObject = {};
-    let header: AnyObject = {};
-    let bodyValue: AnyObject = {};
-    let headerValue: AnyObject = {};
+  const onSubmit: FormEventHandler<HTMLFormElement> = useCallback(
+    (e) => {
+      e.preventDefault();
+      let body: AnyObject = {};
+      let header: AnyObject = {};
+      let bodyValue: AnyObject = {};
+      let headerValue: AnyObject = {};
 
-    for (let key in value.body) {
-      const parsValue = convertToPars(value.body[key]);
-      body = { ...body, [key]: parsValue };
-      bodyValue = { ...bodyValue, [key]: convertToString(parsValue) };
-    }
+      for (let key in value.body) {
+        const parsValue = parser(value.body[key]);
+        body = { ...body, [key]: parsValue };
+        bodyValue = { ...bodyValue, [key]: stringify(parsValue) };
+      }
 
-    for (let key in value.header) {
-      const parsValue = convertToPars(value.header[key]);
-      header = { ...header, [key]: parsValue };
-      headerValue = { ...headerValue, [key]: convertToString(parsValue) };
-    }
-    setTable(createDefaultValue(input.search));
-    setValue({ body: bodyValue, header: headerValue });
-    setData({ operator: input.operator, body, header });
+      for (let key in value.header) {
+        const parsValue = parser(value.header[key]);
+        header = { ...header, [key]: parsValue };
+        headerValue = { ...headerValue, [key]: stringify(parsValue) };
+      }
+      setTable(createDefaultValue(input.search));
+      setValue({ body: bodyValue, header: headerValue });
+      setData({ operator: input.operator, body, header });
 
-    toast.success("Success 🎉");
-  }, [input, value]);
+      toast.success("Success 🎉");
+    },
+    [input, value]
+  );
 
   return (
-    <SimpleBar autoHide={false} className="max-h-screen w-full">
+    <SimpleBar autoHide={false} className="max-h-screen w-full select-none">
       <section className="p-4 max-w-[1500px] mx-auto">
-        <h1 className="centering text-center text-2xl sm:text-3xl md:text-4xl mb-4 text-white font-bold">
-          JavaScript Coercion Rules
-        </h1>
+        <h1 className="centering text-center text-2xl sm:text-3xl md:text-4xl mb-4 text-white font-bold">JavaScript Coercion Rules</h1>
 
         <ul className="text-white font-medium mb-4">
           <li className="flex-start-center gap-2">
@@ -110,19 +106,21 @@ const Page = () => {
           <div className="h-[1.5px] w-full bg-white mt-4"></div>
         </ul>
 
-        <div className="flex-between-center gap-4 md:gap-6 mx-auto mb-8">
-          <button className="h-8 w-[90px] bg-white rounded-md shadow-md font-medium" onClick={onClick}>
-            Submit
-          </button>
+        <form onSubmit={onSubmit} className="flex-between-center gap-4 md:gap-6 mx-auto mb-8">
           <div className="flex-end-center gap-2">
             <p className="whitespace-nowrap text-white font-medium">Row Count : </p>
             <input
+              max={20}
+              min={1}
+              required
+              type="number"
               className="w-full max-w-[80px] h-8 rounded-md text-center shadow-md"
               value={input.search}
               onChange={(e) => setInput((prev) => ({ ...prev, search: e.target.value }))}
             />
           </div>
-        </div>
+          <button className="h-8 w-[90px] bg-white rounded-md shadow-md font-medium">Submit</button>
+        </form>
 
         <div className="centering">
           <SimpleBar autoHide={false} className="max-h-[80svh] w-full">
@@ -130,10 +128,7 @@ const Page = () => {
               <thead>
                 <tr>
                   <th>
-                    <select
-                      onChange={(e) => setInput((prev) => ({ ...prev, operator: e.target.value as OperatorType }))}
-                      value={input.operator}
-                    >
+                    <select onChange={(e) => setInput((prev) => ({ ...prev, operator: e.target.value as OperatorType }))} value={input.operator}>
                       {operator.map((item) => {
                         return (
                           <option key={item} value={item}>
@@ -173,6 +168,15 @@ const Page = () => {
             </table>
           </SimpleBar>
         </div>
+
+        <div className="h-[1.5px] w-full bg-white mt-4"></div>
+
+        <p className="pt-3 centering gap-1 text-white">
+          <span>Like it? Give it a ⭐️ on </span>
+          <Link href="https://github.com/Soheiljafarnejad/JavaScript-operation" target="_blank" className="underline ">
+            GitHub!
+          </Link>
+        </p>
       </section>
     </SimpleBar>
   );
