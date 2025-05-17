@@ -2,7 +2,7 @@
 
 An interactive tool to explore and understand **JavaScript Type Coercion** using different values and operators.
 
-👉 **Live Demo:** [javascript-operation.vercel.app](https://javascript-operation.vercel.app)
+👉 **Live Demo:** [javascript-operation.soheiljafarnejad.ir](https://javascript-operation.soheiljafarnejad.ir/)
 
 ## 🔥 Features
 
@@ -16,5 +16,13 @@ An interactive tool to explore and understand **JavaScript Type Coercion** using
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/javascript-operation.git
+git clone https://github.com/Soheiljafarnejad/javascript-operation.git
 cd javascript-operation
+```
+
+2. Run Project:
+
+```bash
+npm i
+npm run dev
+```
